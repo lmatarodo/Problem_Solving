@@ -56,8 +56,6 @@
   "C_Cpp_Runner.showCompilationTime": false,
   "C_Cpp_Runner.useLinkTimeOptimization": false,
   "C_Cpp_Runner.msvcSecureNoWarnings": false,
-  
-  // Cursor 자동완성 기능 끄기
   "editor.quickSuggestions": {
     "other": false,
     "comments": false,
@@ -69,7 +67,7 @@
   "editor.wordBasedSuggestions": "off",
   "editor.parameterHints.enabled": false,
   "editor.hover.enabled": false,
-  "editor.lightbulb.enabled": false,
+  "editor.lightbulb.enabled": "off",
   "editor.suggest.showKeywords": false,
   "editor.suggest.showSnippets": false,
   "editor.suggest.showClasses": false,
@@ -87,8 +85,6 @@
   "editor.suggest.showEnums": false,
   "editor.suggest.showEnumMembers": false,
   "editor.suggest.showCustomcolors": false,
-  
-  // Cursor AI 자동완성 끄기
   "cursor.autocomplete.enabled": false,
   "cursor.inline.enabled": false,
   "cursor.chat.enabled": false,
