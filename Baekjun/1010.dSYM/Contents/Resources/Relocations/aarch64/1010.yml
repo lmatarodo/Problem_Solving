@@ -1,0 +1,5 @@
+---
+triple:          'arm64-apple-darwin'
+binary-path:     '/Users/donggyu/Documents/Problem_Solving/Baekjun/1010'
+relocations:     []
+...
