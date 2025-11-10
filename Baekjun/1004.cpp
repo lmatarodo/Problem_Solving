@@ -13,37 +13,28 @@ int isInPlanet(vector<int>& planet, vector<int>& start, vector<int>& end) {
     dist1 = sqrt(pow((planet.at(0) - start.at(0)), 2) + pow((planet.at(1) - start.at(1)), 2));
     dist2 = sqrt(pow((planet.at(0) - end.at(0)), 2) + pow((planet.at(1) - end.at(1)), 2));
 
-    if (dist1 < planet.at(2) || dist2 < planet.at(2))
+    if (dist1 < planet.at(2) ^ dist2 < planet.at(2))
         result++;
 
     return result;
 }
 
 int main() {
-    vector<int> start(2);
-    vector<int> end(2);
+
     vector<int> planet(3);
 
     cin >> T;
 
     while (T--) {
-        int num;
-        int total = 0;
-        for (int i = 0; i < 4; i++) {
-            cin >> num;
-            if (i < 2)
-                start.at(i) = num;
-            else
-                end.at(i - 2) = num;
-        }
+        vector<int> start(2);
+        vector<int> end(2);
+        cin >> start[0] >> start[1] >> end[0] >> end[1];
 
+        int total = 0;
         cin >> N;
 
         while (N--) {
-            for (int i = 0; i < 3; i++) {
-                cin >> num;
-                planet.at(i) = num;
-            }
+            cin >> planet[0] >> planet[1] >> planet[2];
             total += isInPlanet(planet, start, end);
         }
 
