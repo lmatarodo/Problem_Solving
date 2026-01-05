@@ -1,0 +1,24 @@
+# Ignore everything
+*
+
+# Don't ignore directories
+!*/
+
+# Don't ignore source files
+!*.cpp
+!*.c
+!*.h
+!*.hpp
+!*.py
+!*.java
+!*.md
+
+# Don't ignore config files
+!.gitignore
+!.vscode/**
+
+# Ignore debug symbols
+*.dSYM/
+
+# macOS system files
+.DS_Store
