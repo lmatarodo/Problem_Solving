@@ -22,3 +22,7 @@
 
 # macOS system files
 .DS_Store
+
+
+# Ignore 삼성알특 사전문제 directory
+삼성알특 사전문제/

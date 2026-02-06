@@ -7,17 +7,18 @@ int dat[MX], pre[MX], nxt[MX];
 int unused = 1;
 
 void insert(int addr, int num){
-    dat[unused] = num;
-    pre[unused] = addr;
-    nxt[unused] = nxt[addr];
-    if (nxt[unused] != -1) pre[nxt[unused]] = unused;
-    nxt[addr] = unused;
+    dat[unused] = num; // 새롭게 추가되는 원소의 데이터 값을 채워넣음
+    pre[unused] = addr; // 새 원소의 이전 원소를 추가되는 위치로 변경
+    nxt[unused] = nxt[addr]; // 새 원소의 다음 원소를 추가되는 위치의 다음 원소로 변경
+    if (nxt[unused] != -1) pre[nxt[unused]] = unused; // 만약 추가되는 위치의 다음 원소가 있었다면, 추가되는 위치의 다음 원소가 가리키는 이전 원소를 새 원소로 변경
+    nxt[addr] = unused; // 추가되는 위치의 다음 원소를 새 원소로 변경
     unused++;
 }
 
 void erase(int addr){   
-    nxt[pre[addr]] = nxt[addr];
-    if (nxt[addr] != -1) pre[nxt[addr]] = pre[addr];
+    nxt[pre[addr]] = nxt[addr]; // 삭제할 위치의 이전 원소가 가리키고 있는 다음 원소를 삭제할 원소의 다음의 원소로 변경
+    if (nxt[addr] != -1) pre[nxt[addr]] = pre[addr]; 
+    // 삭제할 위치가 가리키고 있는 다음원소가 있었다면, 그 다음 원소의 이전 원소를 삭제되는 원소 이전 원소로 변경
 }
 
 void traverse(){

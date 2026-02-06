@@ -17,19 +17,19 @@ int main() {
     int ans = 0x7fffffff;
     
     while (true) {
-        if (sum < n && en < n) {
-            sum += a[en];
+        if (sum < s && en < n) {
+            sum += a[en]; // 인덱스를 옮기기 전에 sum에 반영
             en++;
         }
-        else if (sum >= n) {
+        else if (sum >= s) {
             ans = min(ans, en - st);
-            sum -= a[st];
-            st--;
+            sum -= a[st]; // 인덱스를 옮기기 전에 sum에 반영
+            st++;
         }
-        else if (en == n) break;
+        else if (en == n) break; // 끝 조건에 도달하면 종료
     }
 
-    if (ans == 0x7fffffff) cout << 0;
+    if (ans == 0x7fffffff) cout << 0; // 만약 찾지 못했으면 0을 출력
     else cout << ans;
 
     return 0;

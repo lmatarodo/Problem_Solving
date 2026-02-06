@@ -1,29 +1,27 @@
 #include <iostream>
-#include <vector>
 
 using namespace std;
 
+int n, m;
+int a[100001];
+long long d[100001];
+
 int main() {
-    ios::sync_with_stdio(false); 
-    cin.tie(nullptr); 
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
 
-    int N, M;
-    cin >> N >> M;
-    vector<long long> psum(N + 1, 0);
+    cin >> n >> m;
 
-    for (int i = 1; i <= N; i++) {
-        long long x;
-        cin >> x;
-        psum[i] = psum[i - 1] + x;
+    d[0] = 0;
+    for (int i = 1; i <= n; i++) {
+        cin >> a[i];
+        d[i] = d[i - 1] + a[i];
     }
 
-    while (M--) {
-        int start, end;
-        cin >> start >> end;
-        
-        cout << psum[end] - psum[start - 1] << "\n"; 
+    while (m--) {
+        int st, en;
+        cin >> st >> en;
+        cout << d[en] - d[st - 1] << '\n';
     }
-
-    
-
+    return 0;
 }
