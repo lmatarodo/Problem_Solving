@@ -1,24 +1,45 @@
 #include <iostream>
 #include <algorithm>
+#include <vector>
 
 using namespace std;
 
 int n;
-const int INF = 1e7;
-int dp[100002];
+vector<string> v;
 
-int main() {
-  cin >> n;
+bool cmp(string& A, string& B) {
 
-  for (int i = 2; i <= n; i++) {
-    int d1 = dp[i - 1] + 1; int d2 = INF; int d3 = INF;
-    if (i % 2 == 0)
-      d2 = dp[i / 2] + 1;
-    else if (i % 3 == 0)
-      d3 = dp[i / 3] + 1;
-
-    dp[i] = min({d1, d2, d3});
+  if (A.length() != B.length()) {
+    return A.length() < B.length();
   }
 
-  cout << dp[n];
+  int Acnt = 0;
+  int Bcnt = 0;
+  for (int i = 0; i < A.length(); i++) {
+    if (isdigit(A[i])) Acnt += A[i] - '0';
+    if (isdigit(B[i])) Bcnt += B[i] - '0';
+  }
+
+  if (Acnt != Bcnt) return Acnt < Bcnt;
+
+  return A < B; // 시전 순 정렬?
+
+}
+
+int main() {
+
+  cin >> n;
+
+  for (int i = 0; i < n; i++) {
+    string ipt; cin >> ipt;
+    v.push_back(ipt);
+  }
+
+  sort(v.begin(), v.end(), cmp);
+
+  for (int i = 0; i < n; i++) 
+    cout << v[i] << "\n";
+  
+
+  return 0;
 }
