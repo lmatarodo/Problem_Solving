@@ -2,9 +2,11 @@
 
 using namespace std;
 
+#define ll long long
+
 int n;
-int price[100002];
-int dist[100002];
+ll price[100002];
+ll dist[100002];
 
 int main() {
     cin >> n;
@@ -14,8 +16,8 @@ int main() {
         cin >> price[i];
 
     
-    int minPrice = price[0]; // 현재까지 나온 최솟값의 주유소
-    int answer = price[0] * dist[0];
+    ll minPrice = price[0]; // 현재까지 나온 최솟값의 주유소
+    ll answer = price[0] * dist[0];
     for (int i = 1; i < n - 1; i++) {
         if (price[i] < minPrice) {
             minPrice = price[i];
