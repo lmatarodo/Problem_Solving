@@ -13,11 +13,10 @@ int T, l;
 int board[302][302];
 
 int main() {
-    queue<pair<int, int>> q;
-
     
     cin >> T;
     while (T--) {
+        queue<pair<int, int>> q; // 큐는 매 순간마다 초기화해주어야 한다.
         cin >> l;
         for (int i = 0; i < l; i++) 
             fill(board[i], board[i] + l, -1);
