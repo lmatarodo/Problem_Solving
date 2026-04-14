@@ -1,29 +1,26 @@
 #include <iostream>
-#include <vector>
-#include <algorithm>
 
 using namespace std;
 
+int n, m;
+string s;
+
 int main() {
-    int n;
-    int num;
-    cin >> n;
-    vector<int> origin;
-    vector<int> sorted;
+    cin >> n >> m;
+    cin >> s;
 
-    for (int i = 0; i < n; i++) {
-        cin >> num;
-        origin.push_back(num);
-        sorted.push_back(num);
+    int cnt = 0;
+    for (int i = 0; i < m - 2; i++) {
+        if (s[i] == 'I' && s[i + 1] == 'O' && s[i + 2] == 'I') {
+            int pcnt = 0;
+            while (s[i] == 'I' && s[i + 1] == 'O' && s[i + 2] == 'I') {
+                pcnt++;
+                if (pcnt >= n) cnt++;
+                i += 2;
+                if (i >= m -2) break;
+            }
+        }
     }
-    
-    sort(sorted.begin(), sorted.end());
-    sorted.erase(unique(sorted.begin(), sorted.end()), sorted.end());
-    
-    for (int i = 0; i < n; i++) {
-        int idx = lower_bound(sorted.begin(), sorted.end(), origin[i]) - sorted.begin();
-        cout << idx << " ";
-    }
-
+    cout << cnt;
     return 0;
 }
