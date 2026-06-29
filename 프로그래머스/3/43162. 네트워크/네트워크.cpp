@@ -1,34 +1,38 @@
 #include <string>
 #include <vector>
 #include <queue>
+#include <iostream>
 
 using namespace std;
 
-bool visited[200]; // 컴퓨터 노드를 방문했는지 여부
+bool visited[201];
+
+void bfs(int node, vector<vector<int>>& computers) {
+    queue<int> q;
+    q.push(node);
+    visited[node] = true;
+    
+    while (!q.empty()) {
+        int cur = q.front(); q.pop();
+        
+        for (int i = 0; i < computers[cur].size(); i++) {
+            if (computers[cur][i] == 1 && !visited[i]) {
+                q.push(i);
+                visited[i] = true;
+            }
+        }
+    }
+}
 
 int solution(int n, vector<vector<int>> computers) {
     int answer = 0;
-    queue<int> q;
     
-    for (int i = 0; i < n; i++) {         
-        if (computers[i][i] == 1 && !visited[i]){
-            q.push(i);
-            visited[i] = true;
-            
-            while (!q.empty()){
-                int curr = q.front(); // 현재 컴퓨터 인덱스
-                q.pop();
-                
-                for (int j = 0; j < n; j++) {
-                    if (computers[curr][j] == 1 && !visited[j]) {
-                        q.push(j);
-                        visited[j] = true;
-                    }
-                }
-            }
+    for (int i = 0; i < computers.size(); i++) {
+        if (!visited[i]) {
             answer++;
+            cout << i << "\n";
+            bfs(i, computers);
         }
-        
     }
     
     return answer;
