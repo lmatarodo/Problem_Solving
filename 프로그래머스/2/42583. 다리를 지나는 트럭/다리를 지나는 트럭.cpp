@@ -4,35 +4,34 @@
 
 using namespace std;
 
-int solution(int bridge_length, int weight, vector<int> truck_weights) {
+int solution(int bridge_length, int weigth, vector<int> truck_weights) {
     int answer = 0;
-    int n = truck_weights.size();
-    queue<int> q; // 다리의 역할을 하는 큐
+    queue<int> bridge;
     
-    for (int i = 0; i < bridge_length; i++)
-        q.push(0);
+    for (int i = 0; i < bridge_length; i++) 
+        bridge.push(0);
     
-    int sum = 0;
     int idx = 0;
+    int curWeigth = 0;
     
-    while (idx < n) {
-        sum -= q.front();
-        q.pop();
-        if (sum + truck_weights[idx] <= weight) {
-            sum += truck_weights[idx];
-            q.push(truck_weights[idx]);
-            idx++;
-        } 
-        else {
-            q.push(0);
-        }
-        
-
+    while (!bridge.empty()) {
         answer++;
+        curWeigth -= bridge.front();
+        bridge.pop();
         
+        if (idx < truck_weights.size()) {
+            if (curWeigth + truck_weights[idx] <= weigth) {
+                curWeigth += truck_weights[idx];
+                bridge.push(truck_weights[idx]);
+                idx++;
+            }
+            
+            else {
+                bridge.push(0);
+            }
+        }
         
     }
     
-    answer += bridge_length;
     return answer;
 }
