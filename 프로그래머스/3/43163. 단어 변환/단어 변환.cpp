@@ -2,51 +2,42 @@
 #include <vector>
 #include <queue>
 
-#define X first
-#define Y second
-
 using namespace std;
 
-bool isDiffOne(string& a, string& b) {
-    int diffCnt = 0;
+bool isDiffone(string a, string b) {
+    int cnt = 0;
     for (int i = 0; i < a.size(); i++) {
-        if (a[i] != b[i]) diffCnt++;
+        if (a[i] != b[i]) cnt++;
+        if (cnt > 2) return false; // 조기 종료
     }
-    if(diffCnt == 1) return true;
+    
+    if (cnt == 1) return true;
     else return false;
 }
 
 int solution(string begin, string target, vector<string> words) {
     int answer = 0;
     int n = words.size();
-    queue<pair<string, int>> q;
-    vector<int> visited(n, -1);
-
-    for (int i = 0; i < words.size(); i++) {
-        if (isDiffOne(begin, words[i])) {
-            q.push({words[i], i});
-            if (words[i] == target) return 1;
-            visited[i] = 1;
-        }
-    }
+    
+    vector<int> dist(n + 1, -1);
+    queue<pair<string, int>> q; // 두번째 int는 words에 있는 인덱스 번호
+    q.push({begin, -1});
     
     while (!q.empty()) {
-        
         auto cur = q.front(); q.pop();
         
-        for (int i = 0; i < words.size(); i++) {
-            if (visited[i] == -1 && isDiffOne(cur.X, words[i])) {
-                q.push({words[i], i});
-                visited[i] = visited[cur.Y] + 1;
-                if (words[i] == target) {
-                    answer = visited[i];
-                    return answer;
-                }
-            }
-        }
+        if (cur.first == target) answer = dist[cur.second] + 1;
         
+        for (int i = 0; i < words.size(); i++) {
+            if (dist[i] == -1 && isDiffone(cur.first, words[i])) {
+                q.push({words[i], i});
+                if (cur.second == -1) dist[i]++;
+                else dist[i] = dist[cur.second] + 1;
+            }
+            
+        }
     }
+
     
-    
-    return 0;
+    return answer;
 }
