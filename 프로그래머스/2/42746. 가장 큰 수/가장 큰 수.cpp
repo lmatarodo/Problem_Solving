@@ -4,24 +4,23 @@
 
 using namespace std;
 
-bool cmp(const string& a, const string &b){
+bool cmp(string& a, string& b) {
     return a + b > b + a;
 }
 
 string solution(vector<int> numbers) {
     string answer = "";
-    vector<string> strnum;
-    for (auto n : numbers)
-        strnum.push_back(to_string(n));
     
-    sort(strnum.begin(), strnum.end(), cmp);
+    vector<string> nums;
+    for (int num: numbers) {
+        nums.push_back(to_string(num));
+    }
     
-    string result;
-    if (strnum[0] == "0") return "0";
-    for (auto s: strnum)
-        result += s;
+    sort(nums.begin(), nums.end(), cmp);
     
-    answer = result;
-    
+    for (string num: nums) {
+        answer += num;
+    }
+    if (answer[0] == '0') return "0";
     return answer;
 }
