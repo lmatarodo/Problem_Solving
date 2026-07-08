@@ -1,62 +1,64 @@
 #include <string>
 #include <vector>
 #include <queue>
-#include <cstring>
-#include <iostream>
+#include <algorithm>
 
 using namespace std;
 
-int visited[101][101];
 int board[101][101];
+int dist[101][101];
 int dx[4] = {1, 0, -1, 0};
 int dy[4] = {0, 1, 0, -1};
+
+int bfs(int stX, int stY, int enX, int enY) {
+    for (int i = 0; i < 101; i++) 
+        fill(dist[i], dist[i] + 101, -1);
+    
+    queue<pair<int, int>> q;
+    q.push({stX, stY});
+    dist[stX][stY] = 0;
+    
+    while(!q.empty()) {
+        auto cur = q.front(); q.pop();
+        
+        for (int d = 0; d < 4; d++) {
+            int nx = cur.first + dx[d];
+            int ny = cur.second + dy[d];
+            if (nx < 1 || nx >= 101 || ny < 1 || ny >= 101) continue;
+            if (board[nx][ny] != 1 || dist[nx][ny] != -1) continue;
+            dist[nx][ny] = dist[cur.first][cur.second] + 1;
+            q.push({nx, ny});
+        }
+    }
+    
+    return dist[enX][enY] / 2;
+}
 
 int solution(vector<vector<int>> rectangle, int characterX, int characterY, int itemX, int itemY) {
     int answer = 0;
     
-    for (int i = 0; i < rectangle.size(); i++) {
-        int x1 = rectangle[i][0] * 2;
-        int y1 = rectangle[i][1] * 2;
-        int x2 = rectangle[i][2] * 2;
-        int y2 = rectangle[i][3] * 2;
+    for (auto rect: rectangle) {
+        int x1 = rect[0] * 2;
+        int y1 = rect[1] * 2;
+        int x2 = rect[2] * 2;
+        int y2 = rect[3] * 2;
         
-        for (int i = x1; i <= x2; i++) {
-            for (int j = y1; j <= y2; j++) {
-                if (i > x1 && i < x2 && j > y1 && j < y2) 
-                    board[i][j] = -1;
-                else if (board[i][j] != -1)
-                    board[i][j] = 1; // 테두리 후보들을 채움
+        for (int x = x1; x <= x2; x++) {
+            for (int y = y1; y <= y2; y++) {
+                if (x > x1 && x < x2 && y > y1 && y < y2) {
+                    board[x][y] = 2;
+                }
+                
+                else {
+                    if (board[x][y] != 2) {
+                        board[x][y] = 1;
+                    }
+                }
             }
         }
     }
     
-    for (int i = 0; i < 102; i++) {
-        for (int j = 0; j < 102; j++) {
-            if (board[i][j] == -1) board[i][j] = 0;
-        }
-    }
+    answer = bfs(characterX * 2, characterY * 2, itemX * 2, itemY * 2);
     
-    queue<pair<int, int>> q;
-    q.push({characterX * 2, characterY * 2});
-    visited[characterX * 2][characterY * 2]++;
-    
-    while (!q.empty()) {
-        auto curr = q.front();
-        q.pop();
-        for (int dir = 0; dir < 4; dir++) {
-            bool isvalid = false;
-            int nx = curr.first + dx[dir];
-            int ny = curr.second + dy[dir];
-            
-            if (nx < 1 || nx > 100 || ny < 1 || ny > 100) continue; // 범위 벗어나면 스킵
-            if (visited[nx][ny] > 0) continue; // 이미 방문한 적이 있으면 스킵
-            if (board[nx][ny] != 1) continue;
-            q.push({nx, ny});
-            visited[nx][ny] = visited[curr.first][curr.second] + 1;
-        }
-        
-    }
-    
-    answer = visited[itemX * 2][itemY * 2] / 2;
     return answer;
 }
