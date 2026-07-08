@@ -10,139 +10,105 @@ using namespace std;
 
 int dx[4] = {1, 0, -1, 0};
 int dy[4] = {0, 1, 0, -1};
-bool s_visited[52][52];
-bool b_visited[52][52];
 
-vector<pair<int, int>> rotateShape(vector<pair<int, int>>& shape) {
-    for (auto& coord: shape) {
-        int x = coord.X;
-        int y = coord.Y;
-        coord.X = y;
-        coord.Y = -x;
+vector<pair<int, int>> normalize(vector<pair<int, int>>& shape) {
+    int minX = 1e9; int minY = 1e9;
+    for (auto s: shape) {
+        if (s.X < minX) minX = s.X;
+        if (s.Y < minY) minY = s.Y;
     }
     
-    int minX = 100;
-    int minY = 100;
-    for (auto& coord: shape) {
-        minX = min(minX, coord.X);
-        minY = min(minY, coord.Y);
-    }
-    
-    for (auto& coord: shape) {
-        coord.X -= minX;
-        coord.Y -= minY;
+    for (auto& s: shape) {
+        s.X -= minX;
+        s.Y -= minY;
     }
     
     sort(shape.begin(), shape.end());
     return shape;
 }
 
+void rotate(vector<pair<int, int>>& shape) {
+    for (auto& s: shape) {
+        int curX = s.X;
+        s.X = s.Y;
+        s.Y = -curX;
+    }
+    
+    normalize(shape);
+}
+
+vector<pair<int, int>> bfs(int sX, int sY, vector<vector<int>>& board, vector<vector<bool>>& visited, int target) {
+    queue<pair<int, int>> q;
+    vector<pair<int, int>> shape;
+    int n = board.size();
+
+    q.push({sX, sY}); shape.push_back({sX, sY});
+    visited[sX][sY] = true;
+    
+    while (!q.empty()) {
+        auto cur = q.front(); q.pop();
+        
+        for (int dir = 0; dir < 4; dir++) {
+            int nx = cur.X + dx[dir];
+            int ny = cur.Y + dy[dir];
+            if (nx < 0 || nx >= n || ny < 0 || ny >= n) continue;
+            if (visited[nx][ny] || board[nx][ny] != target) continue;
+            q.push({nx, ny});
+            shape.push_back({nx, ny});
+            visited[nx][ny] = true;
+        }
+    }
+    
+    return normalize(shape);
+}
 
 int solution(vector<vector<int>> game_board, vector<vector<int>> table) {
     int answer = 0;
+    int n = game_board.size();
+    vector<vector<bool>> visited(n, vector<bool>(n, false));
     
-    vector<vector<pair<int, int>>> shapes; // 도형들 좌표 모음, 10개 선언해놓음 미리
-    vector<vector<pair<int, int>>> blanks; // 빈칸들 좌표 모음
-    queue<pair<int, int>> s_q;
-    queue<pair<int, int>> b_q;
-    int n = table.size();
-
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            if (table[i][j] == 1 && !s_visited[i][j]) {
-                vector<pair<int, int>> shape;
-                s_q.push({i, j});
-                s_visited[i][j] = true;
-                shape.push_back({i, j});
-                
-                while (!s_q.empty()) {
-                    auto cur = s_q.front(); s_q.pop();
-                    for (int dir = 0; dir < 4; dir++) {
-                        int nx = cur.X + dx[dir];
-                        int ny = cur.Y + dy[dir];
-                        if (nx < 0 || nx >= n || ny < 0 || ny >= n) continue;
-                        if (s_visited[nx][ny] || table[nx][ny] == 0) continue;
-                        s_q.push({nx, ny});
-                        s_visited[nx][ny] = true;
-                        shape.push_back({nx, ny});
-                    }
-                }
-                int minX = 100; int minY = 100;
-                
-                for (auto s: shape) {
-                    minX = min(s.X, minX);
-                    minY = min(s.Y, minY);
-                }
-                
-                for (auto& s: shape) { // 꼭 참조로 받아야 원본이 수정됨!! 주의
-                    s.X -= minX;
-                    s.Y -= minY;
-                }
-                sort(shape.begin(), shape.end());
-                shapes.push_back(shape);
-            }
-            
-            if (game_board[i][j] == 0 && !b_visited[i][j]) {
-                vector<pair<int, int>> blank;
-                b_q.push({i, j});
-                b_visited[i][j] = true;
-                blank.push_back({i, j});
-                
-                while (!b_q.empty()) {
-                    auto cur = b_q.front(); b_q.pop();
-                    for (int dir = 0; dir < 4; dir++) {
-                        int nx = cur.X + dx[dir];
-                        int ny = cur.Y + dy[dir];
-                        if (nx < 0 || nx >= n || ny < 0 || ny >= n) continue;
-                        if (b_visited[nx][ny] || game_board[nx][ny] == 1) continue;
-                        b_q.push({nx, ny});
-                        b_visited[nx][ny] = true;
-                        blank.push_back({nx, ny});
-                    }
-                }
-                
-                int minX = 100; int minY = 100;
-                for (auto b: blank) {
-                    minX = min(b.X, minX);
-                    minY = min(b.Y, minY);
-                }
-                
-                for (auto& b: blank) { // 꼭 참조로 받아야 원본이 수정됨!! 주의
-                    b.X -= minX;
-                    b.Y -= minY;
-                }
-                
-                sort(blank.begin(), blank.end());
-                blanks.push_back(blank);
+    vector<vector<pair<int, int>>> empty;
+    vector<vector<pair<int, int>>> shapes;
+    
+    for (int i = 0; i < game_board.size(); i++) {
+        for (int j = 0; j < game_board[i].size(); j++) {
+            if (game_board[i][j] == 0 && visited[i][j] == false) {
+                empty.push_back(bfs(i, j, game_board, visited, 0));
             }
         }
     }
     
+    for (int i = 0; i < n; i++)
+        fill(visited[i].begin(), visited[i].end(), false);
     
-    vector<bool> isused(shapes.size(), false);
-    for (auto& blank: blanks) {
-        for (int i = 0; i < shapes.size(); i++) {
-            if (isused[i]) continue;
-            if (blank.size() != shapes[i].size()) continue;
-            
-            
-            vector<pair<int, int>> rotated = shapes[i];
-            bool isMatch = false;
-            for (int r = 0; r < 4; r++) {
-                if (rotated == blank) {
-                    isMatch = true;
-                    break;
-                }
-                rotated = rotateShape(rotated);
-            }
-            
-            if (isMatch) {
-                isused[i] = true;
-                answer += blank.size();
-                break;
+    for (int i = 0; i < table.size(); i++) {
+        for (int j = 0; j < table[i].size(); j++) {
+            if (table[i][j] == 1 && visited[i][j] == false) {
+                shapes.push_back(bfs(i, j, table, visited, 1));
             }
         }
-    }    
+    }
+    
+    vector<bool> used(shapes.size(), false);
+    
+    for (auto e: empty) {
+        for (int s = 0; s < shapes.size(); s++) {
+            if (used[s]) continue;
+            if (e.size() != shapes[s].size()) continue;
+            
+            
+            for (int d = 0; d < 4; d++) {
+                if (e == shapes[s]) {
+                    used[s] = true;
+                    answer += shapes[s].size();
+                    break;
+                }
+                rotate(shapes[s]);
+            }
+            
+            if (used[s]) break;
+        }
+    }
     
     return answer;
 }
