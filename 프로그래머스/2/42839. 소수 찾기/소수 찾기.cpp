@@ -1,58 +1,45 @@
 #include <string>
 #include <vector>
-#include <iostream>
 #include <set>
 
 using namespace std;
 
-int n, m;
-int arr[8];
-int ipt[8];
-bool isused[8];
-int globAns;
-set<int> s;
+set<int> nums;
+bool isused[10];
 
-bool isPrime(int x) {
-    if (x < 2) return false;
-    for (int i = 2; i * i <= x; i++) {
-        if (x % i == 0) return false;
-    }
-    return true;
-}
-
-void func(int k) {
-    if (k == m) {
-        int num = 0;
-        for (int i = 0; i < m; i++)
-            num = num * 10 + arr[i];
-        cout << num << "\n";
-        s.insert(num);
-        return;
-    }
+void dfs(string cur, string& numbers) {
+    if (!cur.empty()) nums.insert(stoi(cur));
     
-    for (int i = 0; i < n; i++) {
+    if (cur.size() == numbers.size()) return;
+    
+    for (int i = 0; i < numbers.size(); i++) {
         if (!isused[i]) {
-            arr[k] = ipt[i];
-            isused[i] = 1;
-            func(k + 1);
-            isused[i] = 0;
+            isused[i] = true;
+            cur.push_back(numbers[i]);
+            dfs(cur, numbers);
+            isused[i] = false;
+            cur.pop_back();
         }
     }
 }
 
-int solution(string numbers) {
-    int answer = 0;
-    n = numbers.size();
-    for (int i = 0; i < n; i++)
-        ipt[i] = numbers[i] - '0';
+bool isPrime(int num) {
+    if (num < 2) return false;
     
-    for (int i = 1; i <= n; i++){
-        m = i;
-        func(0);
+    for (int i = 2; i * i <= num; i++) {
+        if (num % i == 0) return false;
     }
     
-    for (auto it :s) {
-        if (isPrime(it)) answer++;
+    return true;
+}
+
+int solution(string numbers) {
+    int answer = 0;
+    
+    dfs("", numbers);
+    
+    for (int num: nums) {
+        if (isPrime(num)) answer++;
     }
     
     return answer;
