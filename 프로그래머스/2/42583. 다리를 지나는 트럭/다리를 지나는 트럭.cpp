@@ -4,34 +4,32 @@
 
 using namespace std;
 
-int solution(int bridge_length, int weigth, vector<int> truck_weights) {
+int solution(int bridge_length, int weight, vector<int> truck_weights) {
     int answer = 0;
-    queue<int> bridge;
     
-    for (int i = 0; i < bridge_length; i++) 
+    queue<int> bridge;
+    int bridge_weight = 0;
+    for (int i = 0; i < bridge_length; i++) {
         bridge.push(0);
+    }
     
     int idx = 0;
-    int curWeigth = 0;
-    
-    while (!bridge.empty()) {
-        answer++;
-        curWeigth -= bridge.front();
+    while (idx < truck_weights.size()) {
+        bridge_weight -= bridge.front();
         bridge.pop();
         
-        if (idx < truck_weights.size()) {
-            if (curWeigth + truck_weights[idx] <= weigth) {
-                curWeigth += truck_weights[idx];
-                bridge.push(truck_weights[idx]);
-                idx++;
-            }
+        if (bridge_weight + truck_weights[idx] <= weight) {
+            bridge.push(truck_weights[idx]);
+            bridge_weight += truck_weights[idx];
+            idx++;
             
-            else {
-                bridge.push(0);
-            }
         }
-        
+        else {
+            bridge.push(0);
+        }
+        answer++;
     }
+    answer += bridge_length;
     
     return answer;
 }
