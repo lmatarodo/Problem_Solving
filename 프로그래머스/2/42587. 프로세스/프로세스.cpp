@@ -6,30 +6,29 @@ using namespace std;
 
 int solution(vector<int> priorities, int location) {
     int answer = 0;
-    queue<pair<int,int>> q; // 우선순위, 들어간 순서(원래 location과의 대조)
+    queue<pair<int, int>> q; // 우선순위, 인덱스 번호
     priority_queue<int> pq;
+    vector<int> turn(priorities.size());
     
     for (int i = 0; i < priorities.size(); i++) {
         q.push({priorities[i], i});
         pq.push(priorities[i]);
     }
     
-    int cnt = 0; // 몇번째로 실행되는지
+    int cnt = 0;
     while (!q.empty()) {
-        auto nxt = q.front(); q.pop();
-        if (pq.top() > nxt.first) {
-            q.push(nxt);
+        auto cur = q.front();
+        if (cur.first < pq.top()) {
+            q.push(cur);
+            q.pop();
         }
-        
         else {
-            pq.pop();
+            turn[cur.second] = cnt;
             cnt++;
-            if (nxt.second == location) {
-                answer = cnt;
-                break;
-            }
+            q.pop(); pq.pop();
         }
     }
     
+    answer = turn[location] + 1;
     return answer;
 }
