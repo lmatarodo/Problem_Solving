@@ -7,22 +7,25 @@ using namespace std;
 
 vector<int> solution(vector<int> progresses, vector<int> speeds) {
     vector<int> answer;
-    vector<int> complete;
     
-    for (int i = 0; i < int(progresses.size()); i++) 
-        complete.push_back(ceil(double(100 - progresses[i]) / speeds[i]));
+    int n = progresses.size();
+    vector<int> complete(n, 0);
     
-    
-    for (int i = 0; i < int(complete.size()); i++) {
-        int j = i + 1;
-        int cnt = 1;
-        while (j < (int)complete.size() && complete[i] >= complete[j]) {
-            j++;
-            cnt++;
-        }
-        i = j - 1;
-        answer.push_back(cnt);
+    for (int i = 0; i < n; i++) {
+        complete[i] = ceil((double)(100 - progresses[i]) / speeds[i]);
     }
+    
+    int max_idx = 0;
+    int cur_max = complete[0];
+    
+    for (int i = 1; i < n; i++) {
+        if (cur_max < complete[i]) {
+            answer.push_back(i - max_idx);
+            max_idx = i;
+            cur_max = complete[i];
+        }
+    }
+    answer.push_back(n - max_idx);
     
     return answer;
 }
