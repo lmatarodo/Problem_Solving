@@ -7,15 +7,14 @@ using namespace std;
 vector<int> solution(vector<int> prices) {
     int n = prices.size();
     vector<int> answer(n, 0);
+    stack<int> st; // 아직 가격이 떨어지지 않은 주식의 인덱스 번호
     
-    stack<int> st;
-    for (int i = 0; i < prices.size(); i++) {
-        // 가격이 떨어졌으면, 그 시점을 저장
+    for (int i = 0; i < n; i++) {
         while (!st.empty() && prices[st.top()] > prices[i]) {
             answer[st.top()] = i - st.top();
             st.pop();
         }
-            
+        
         st.push(i);
     }
     
