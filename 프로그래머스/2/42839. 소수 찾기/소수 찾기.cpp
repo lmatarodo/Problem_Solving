@@ -1,27 +1,12 @@
 #include <string>
 #include <vector>
+#include <string>
 #include <set>
 
 using namespace std;
 
-set<int> nums;
 bool isused[10];
-
-void dfs(string cur, string& numbers) {
-    if (!cur.empty()) nums.insert(stoi(cur));
-    
-    if (cur.size() == numbers.size()) return;
-    
-    for (int i = 0; i < numbers.size(); i++) {
-        if (!isused[i]) {
-            isused[i] = true;
-            cur.push_back(numbers[i]);
-            dfs(cur, numbers);
-            isused[i] = false;
-            cur.pop_back();
-        }
-    }
-}
+set<int> s;
 
 bool isPrime(int num) {
     if (num < 2) return false;
@@ -29,8 +14,28 @@ bool isPrime(int num) {
     for (int i = 2; i * i <= num; i++) {
         if (num % i == 0) return false;
     }
-    
     return true;
+}
+
+void dfs(string curnum, string numbers) {
+    
+    if (curnum != "" && isPrime(stoi(curnum))) {
+        s.insert(stoi(curnum));
+    }
+    
+    if (curnum.size() == numbers.size()) {
+        return;
+    }
+    
+    for (int i = 0; i < numbers.size(); i++) {
+        if (!isused[i]) {
+            isused[i] = true;
+            curnum += numbers[i];
+            dfs(curnum, numbers);
+            isused[i] = false;
+            curnum.pop_back();
+        }
+    }
 }
 
 int solution(string numbers) {
@@ -38,9 +43,6 @@ int solution(string numbers) {
     
     dfs("", numbers);
     
-    for (int num: nums) {
-        if (isPrime(num)) answer++;
-    }
-    
+    answer = s.size();
     return answer;
 }
