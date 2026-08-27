@@ -1,25 +1,15 @@
 #include <string>
 #include <vector>
-#include <queue>
-#include <iostream>
 
 using namespace std;
 
-bool visited[201];
+bool isvisited[202];
 
-void bfs(int node, vector<vector<int>>& computers) {
-    queue<int> q;
-    q.push(node);
-    visited[node] = true;
-    
-    while (!q.empty()) {
-        int cur = q.front(); q.pop();
-        
-        for (int i = 0; i < computers[cur].size(); i++) {
-            if (computers[cur][i] == 1 && !visited[i]) {
-                q.push(i);
-                visited[i] = true;
-            }
+void dfs(int curnode, vector<vector<int>>& computers) {
+    for (int i = 0; i < computers[curnode].size(); i++) {
+        if (!isvisited[i] && computers[curnode][i] == 1) {
+            isvisited[i] = true;
+            dfs(i, computers);
         }
     }
 }
@@ -28,10 +18,9 @@ int solution(int n, vector<vector<int>> computers) {
     int answer = 0;
     
     for (int i = 0; i < computers.size(); i++) {
-        if (!visited[i]) {
+        if (!isvisited[i]) {
             answer++;
-            cout << i << "\n";
-            bfs(i, computers);
+            dfs(i, computers);
         }
     }
     
