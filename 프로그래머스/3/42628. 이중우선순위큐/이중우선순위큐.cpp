@@ -1,40 +1,67 @@
 #include <string>
 #include <vector>
-#include <set>
+#include <queue>
 
 using namespace std;
 
 vector<int> solution(vector<string> operations) {
     vector<int> answer;
-    multiset<int> mq;
+    priority_queue<pair<int, int>> maxQ;
+    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int ,int>>> minQ;
+    bool deleted[1000002];
+    
+    int id = 0;
     
     for (int i = 0; i < operations.size(); i++) {
         char op = operations[i][0];
         
         if (op == 'I') {
             int num = stoi(operations[i].substr(2));
-            mq.insert(num);
+            
+            maxQ.push({num, id});
+            minQ.push({num, id});
+            
+            id++;
         }
         
         else if (op == 'D') {
-            if (!mq.empty() && operations[i][2] == '1') { // 최댓값 하나 삭제
-                mq.erase(prev(mq.end()));
+            if (operations[i][2] == '1') {
+                while (!maxQ.empty() && deleted[maxQ.top().second]) {
+                    maxQ.pop();
+                }
+                
+                if (!maxQ.empty()) {
+                    deleted[maxQ.top().second] = true;
+                    maxQ.pop();
+                }
+                
             }
             
-            else if (!mq.empty() && operations[i][2] == '-') { // 최솟값 하나 삭제
-                mq.erase(mq.begin());
+            else if (operations[i][2] == '-') {
+                while (!minQ.empty() && deleted[minQ.top().second]) {
+                    minQ.pop();
+                }
+                
+                if (!minQ.empty()) {
+                    deleted[minQ.top().second] = true;
+                    minQ.pop();
+                }
             }
         }
     }
     
-    if (mq.empty()) {
+    while (!maxQ.empty() && deleted[maxQ.top().second]) 
+        maxQ.pop();
+    
+    while (!minQ.empty() && deleted[minQ.top().second])
+        minQ.pop();
+    
+    if (maxQ.empty() || minQ.empty()) {
         answer.push_back(0); answer.push_back(0);
     }
     else {
-        answer.push_back(*mq.rbegin());
-        answer.push_back(*mq.begin());
+        answer.push_back(maxQ.top().first); answer.push_back(minQ.top().first);
     }
-    
     
     return answer;
 }
