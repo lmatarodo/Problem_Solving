@@ -1,64 +1,63 @@
 #include <string>
 #include <vector>
 #include <queue>
-#include <algorithm>
+
 #define X first
 #define Y second
 
 using namespace std;
 
-int dist[6][6];
-char room[6][6];
 int dx[4] = {1, 0, -1, 0};
 int dy[4] = {0, 1, 0, -1};
 
-bool bfs(int x, int y) {
-    for (int i = 0; i < 5; i++)
-        fill(dist[i], dist[i] + 5, -1);
-    
+int bfs(int stx, int sty, vector<string> place, vector<vector<int>>& dist) {
     queue<pair<int, int>> q;
-    q.push({x, y});
-    dist[x][y] = 0;
+    q.push({stx, sty});
+    dist[stx][sty] = 0;
     
     while (!q.empty()) {
         auto cur = q.front(); q.pop();
-        for (int dir = 0; dir < 4; dir++) {
-            int nx = cur.X + dx[dir];
-            int ny = cur.Y + dy[dir];
+            
+        for (int d = 0; d < 4; d++) {
+            int nx = cur.X + dx[d];
+            int ny = cur.Y + dy[d];
+            
             if (nx < 0 || nx >= 5 || ny < 0 || ny >= 5) continue;
-            if (dist[nx][ny] == -1 && room[nx][ny] != 'X') {
-                dist[nx][ny] = dist[cur.X][cur.Y] + 1;
-                q.push({nx, ny});
-                if (room[nx][ny] == 'P' && dist[nx][ny] <= 2) return false;
+            if (dist[nx][ny] != -1 || place[nx][ny] == 'X') continue;
+            
+            q.push({nx, ny});
+            dist[nx][ny] = dist[cur.X][cur.Y] + 1;
+            
+            if (place[nx][ny] == 'P') {
+                return dist[nx][ny];
             }
         }
     }
-    
-    return true;
+    return -1;
 }
 
 vector<int> solution(vector<vector<string>> places) {
     vector<int> answer;
     
     for (auto place: places) {
-        vector<pair<int, int>> p_pos; // p인 인덱스 들의 위치 저장해놓음
-        // 초기화 페이스
-        for (int i = 0; i < place.size(); i++) {
-            for (int j = 0; j < place[0].size(); j++) {
-                room[i][j] = place[i][j];
-                if (place[i][j] == 'P') p_pos.push_back({i, j});
-                dist[i][j] = -1;
-            }
-        }
         
-        bool isViolate = false;
-        for (auto p: p_pos) {
-            if (!bfs(p.first, p.second)) isViolate = true;
+        bool isOk = true;
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < 5; j++) {
+                if (place[i][j] == 'P') {
+                    vector<vector<int>> dist(5, vector<int>(5, -1));
+                    int minDist = bfs(i, j, place, dist);
+                    if (minDist != -1 && minDist <= 2) {
+                        isOk = false;
+                        break;
+                    }
+                }
+            }
+            if (!isOk) break;
         }
-        if (isViolate) answer.push_back(0);
-        else answer.push_back(1);
+        if (isOk) answer.push_back(1);
+        else answer.push_back(0);
     }
-    
     
     return answer;
 }
