@@ -1,63 +1,69 @@
 #include <string>
 #include <vector>
+#include <sstream>
 #include <map>
 #include <cmath>
 #include <iostream>
 
 using namespace std;
 
-int calculateTime(const string& A, const string& B) { // 출차시간, 입차시간
-    int Amin = stoi(A.substr(3, 2));
-    int Bmin = stoi(B.substr(3, 2));
-    int Ah = stoi(A.substr(0, 2));
-    int Bh = stoi(B.substr(0, 2));
+int calculateTime(string inTime, string outTime) {
+    int inHour = stoi(inTime.substr(0, 2)); 
+    int outHour = stoi(outTime.substr(0, 2));
+    int inMin = stoi(inTime.substr(3, 2));
+    int outMin = stoi(outTime.substr(3, 2));
     
-    int sum = 0;
-    if (Amin < Bmin) {
-        sum = (Ah - Bh - 1) * 60 + (60 - (Bmin - Amin));
+    int totalTime = 0;
+    if (outMin >= inMin) {
+        totalTime += (outMin - inMin);
+        totalTime += (outHour - inHour) * 60;
+        
+    } else {
+        totalTime += (60 - inMin + outMin);
+        totalTime += (outHour - inHour - 1) * 60;
     }
-    else {
-        sum = (Ah - Bh) * 60 + (Amin - Bmin);
-    }
-    return sum;
+    return totalTime;
 }
 
 vector<int> solution(vector<int> fees, vector<string> records) {
     vector<int> answer;
-    map<string, int> m1; // 차량 번호, 총 주차 시간
-    map<string, string> m2; // 차량 번호, 마지막 입차시간
     
-    for (int i = 0; i < records.size(); i++) {
-        if (records[i][11] == 'I') { // 입차인 경우
-            string name = records[i].substr(6, 4);
-            string time = records[i].substr(0, 5);
-            m2[name] = time;
+    map<string, int> m1; // 차량번호, 주차시간
+    map<string, string> m2; // 차량번호, 마지막 입차시간
+    
+    for (string record: records) {
+        stringstream ss(record);
+        string time, num, move;
+        
+        ss >> time >> num >> move;
+        
+        if (move == "IN") {
+            m2[num] = time;
         }
-        else if (records[i][11] == 'O') { // 출차인 경우
-            string name = records[i].substr(6, 4);
-            string time = records[i].substr(0, 5);
-            auto it = m2.find(name);
-            int parkingTime = calculateTime(time, it->second); // 출차시간, 입차시간
-            m1[name] += parkingTime;
-            m2.erase(name); 
+        
+        else if (move == "OUT") {
+            string lastInTime = m2[num];
+            int parkTime = calculateTime(lastInTime, time);
+            m1[num] += parkTime;
+            m2.erase(num);
         }
     }
     
-    for (auto it : m2) { // 아직 입차시간이 남아있는 것들에 대해
-        m1[it.first] += calculateTime("23:59", it.second);
+    for (auto m: m2) {
+        int parkTime = calculateTime(m.second, "23:59");
+        m1[m.first] += parkTime;
     }
     
-    for (auto it: m1) { // 총 요금 계산
-        //cout << it.first << " " << it.second << "\n";
-        if (it.second <= fees[0]) { // 기본 시간을 넘지 않음
+    for (auto m: m1) {
+        if (m.second <= fees[0]) {
             answer.push_back(fees[1]);
         }
-        else { // 기본 시간을 넘음
-            int total = fees[1] + ceil((double)(it.second - fees[0]) / fees[2]) * fees[3];
-            answer.push_back(total);
+        else {
+            int totalFee = fees[1];
+            totalFee += ceil((double)(m.second - fees[0]) / fees[2]) * fees[3];
+            answer.push_back(totalFee);
         }
     }
-    
     
     return answer;
 }
