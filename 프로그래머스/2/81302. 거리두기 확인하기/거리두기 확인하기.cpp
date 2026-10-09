@@ -2,52 +2,50 @@
 #include <vector>
 #include <queue>
 
-#define X first
-#define Y second
+#define R first
+#define C second
 
 using namespace std;
 
-int dx[4] = {1, 0, -1, 0};
-int dy[4] = {0, 1, 0, -1};
+int dr[4] = {1, 0, -1, 0};
+int dc[4] = {0, 1, 0, -1};
 
-int bfs(int stx, int sty, vector<string> place, vector<vector<int>>& dist) {
+int bfs(int stR, int stC, vector<vector<int>>& dist, vector<string>& place) { // 어느 한 P로부터 다른 P로 갈 수 있는 최단 거리 반환
     queue<pair<int, int>> q;
-    q.push({stx, sty});
-    dist[stx][sty] = 0;
+    q.push({stR, stC});
+    dist[stR][stC] = 0;
     
     while (!q.empty()) {
+        
         auto cur = q.front(); q.pop();
+        
+        for (int dir = 0; dir < 4; dir++) {
             
-        for (int d = 0; d < 4; d++) {
-            int nx = cur.X + dx[d];
-            int ny = cur.Y + dy[d];
+            int nr = cur.R + dr[dir]; int nc = cur.C + dc[dir];
+            if (nr < 0 || nr >= 5 || nc < 0 || nc >= 5) continue;
+            if (dist[nr][nc] != -1 || place[nr][nc] == 'X') continue;
             
-            if (nx < 0 || nx >= 5 || ny < 0 || ny >= 5) continue;
-            if (dist[nx][ny] != -1 || place[nx][ny] == 'X') continue;
-            
-            q.push({nx, ny});
-            dist[nx][ny] = dist[cur.X][cur.Y] + 1;
-            
-            if (place[nx][ny] == 'P') {
-                return dist[nx][ny];
-            }
+            q.push({nr, nc});
+            dist[nr][nc] = dist[cur.R][cur.C] + 1;
+            if (place[nr][nc] == 'P') return dist[nr][nc];
         }
     }
+    
     return -1;
 }
 
 vector<int> solution(vector<vector<string>> places) {
     vector<int> answer;
     
-    for (auto place: places) {
-        
+    for (auto& place: places) {
         bool isOk = true;
         for (int i = 0; i < 5; i++) {
             for (int j = 0; j < 5; j++) {
                 if (place[i][j] == 'P') {
                     vector<vector<int>> dist(5, vector<int>(5, -1));
-                    int minDist = bfs(i, j, place, dist);
+                    int minDist = bfs(i, j, dist, place);
                     if (minDist != -1 && minDist <= 2) {
+                        answer.push_back(0);
                         isOk = false;
                         break;
                     }
@@ -56,7 +54,6 @@ vector<int> solution(vector<vector<string>> places) {
             if (!isOk) break;
         }
         if (isOk) answer.push_back(1);
-        else answer.push_back(0);
     }
     
     return answer;
