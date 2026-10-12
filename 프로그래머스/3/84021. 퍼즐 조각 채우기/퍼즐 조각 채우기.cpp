@@ -3,110 +3,88 @@
 #include <queue>
 #include <algorithm>
 
-#define X first
-#define Y second
+#define R first
+#define C second
 
 using namespace std;
 
-int dx[4] = {1, 0, -1, 0};
-int dy[4] = {0, 1, 0, -1};
+int dr[4] = {1, 0, -1, 0};
+int dc[4] = {0, 1, 0, -1};
 
-vector<pair<int, int>> normalize(vector<pair<int, int>>& shape) {
-    int minX = 1e9; int minY = 1e9;
-    for (auto s: shape) {
-        if (s.X < minX) minX = s.X;
-        if (s.Y < minY) minY = s.Y;
-    }
-    
-    for (auto& s: shape) {
-        s.X -= minX;
-        s.Y -= minY;
-    }
-    
+void normalize(vector<pair<int, int>>& shape) {
     sort(shape.begin(), shape.end());
-    return shape;
+    int minR = shape[0].R; int minC = shape[0].C;
+    
+    for (auto& i: shape) {
+        i.R -= minR; i.C -= minC;
+    }
 }
 
-void rotate(vector<pair<int, int>>& shape) {
-    for (auto& s: shape) {
-        int curX = s.X;
-        s.X = s.Y;
-        s.Y = -curX;
+vector<pair<int, int>> rotate(vector<pair<int, int>>& shape) {
+    vector<pair<int, int>> unit;
+    
+    for (auto &s: shape) {
+        unit.push_back({s.C, -s.R});
     }
     
-    normalize(shape);
+    normalize(unit);
+    return unit;
 }
 
-vector<pair<int, int>> bfs(int sX, int sY, vector<vector<int>>& board, vector<vector<bool>>& visited, int target) {
+vector<pair<int, int>> bfs(int str, int stc, int type, vector<vector<bool>>& visited, vector<vector<int>>& map) {
+    vector<pair<int, int>> unit;
+    unit.push_back({str, stc});
+    
     queue<pair<int, int>> q;
-    vector<pair<int, int>> shape;
-    int n = board.size();
-
-    q.push({sX, sY}); shape.push_back({sX, sY});
-    visited[sX][sY] = true;
+    q.push({str, stc});
+    visited[str][stc] = true;
     
     while (!q.empty()) {
         auto cur = q.front(); q.pop();
-        
         for (int dir = 0; dir < 4; dir++) {
-            int nx = cur.X + dx[dir];
-            int ny = cur.Y + dy[dir];
-            if (nx < 0 || nx >= n || ny < 0 || ny >= n) continue;
-            if (visited[nx][ny] || board[nx][ny] != target) continue;
-            q.push({nx, ny});
-            shape.push_back({nx, ny});
-            visited[nx][ny] = true;
+            int nr = cur.R + dr[dir]; int nc = cur.C + dc[dir];
+            if (nr < 0 || nr >= map.size() || nc < 0 || nc >= map.size()) continue;
+            if (visited[nr][nc] || map[nr][nc] != type) continue;
+            unit.push_back({nr, nc});
+            q.push({nr, nc});
+            visited[nr][nc] = true;
         }
     }
-    
-    return normalize(shape);
+    normalize(unit);
+    return unit;
 }
 
 int solution(vector<vector<int>> game_board, vector<vector<int>> table) {
     int answer = 0;
     int n = game_board.size();
-    vector<vector<bool>> visited(n, vector<bool>(n, false));
     
-    vector<vector<pair<int, int>>> empty;
     vector<vector<pair<int, int>>> shapes;
+    vector<vector<pair<int, int>>> empty;
     
-    for (int i = 0; i < game_board.size(); i++) {
-        for (int j = 0; j < game_board[i].size(); j++) {
-            if (game_board[i][j] == 0 && visited[i][j] == false) {
-                empty.push_back(bfs(i, j, game_board, visited, 0));
-            }
-        }
-    }
+    vector<vector<bool>> gvisited(n, vector<bool>(n, false));
+    vector<vector<bool>> tvisited(n, vector<bool>(n, false));
     
-    for (int i = 0; i < n; i++)
-        fill(visited[i].begin(), visited[i].end(), false);
-    
-    for (int i = 0; i < table.size(); i++) {
-        for (int j = 0; j < table[i].size(); j++) {
-            if (table[i][j] == 1 && visited[i][j] == false) {
-                shapes.push_back(bfs(i, j, table, visited, 1));
-            }
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            if (game_board[i][j] == 0 && !gvisited[i][j]) empty.push_back(bfs(i, j, 0, gvisited, game_board));
+            if (table[i][j] == 1 && !tvisited[i][j]) shapes.push_back(bfs(i, j, 1, tvisited, table));
         }
     }
     
     vector<bool> used(shapes.size(), false);
-    
-    for (auto e: empty) {
-        for (int s = 0; s < shapes.size(); s++) {
-            if (used[s]) continue;
-            if (e.size() != shapes[s].size()) continue;
+    for (auto& e: empty) {
+        for (int i = 0; i < shapes.size(); i++) {
+            if (used[i]) continue;
             
-            
-            for (int d = 0; d < 4; d++) {
-                if (e == shapes[s]) {
-                    used[s] = true;
-                    answer += shapes[s].size();
+            for (int dir = 0; dir < 4; dir++) {
+                if (e == shapes[i]) {
+                    answer += e.size();
+                    used[i] = true;
                     break;
                 }
-                rotate(shapes[s]);
+                shapes[i] = rotate(shapes[i]);
             }
-            
-            if (used[s]) break;
+            if (used[i]) break;
         }
     }
     
